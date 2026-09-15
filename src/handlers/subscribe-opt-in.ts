@@ -1,17 +1,18 @@
 import { Composer } from "grammy";
+import type { Ctx } from "../bot.js";
+import { adminChatId, inlineButton, inlineKeyboard, registerMainMenuItem } from "../toolkit/index.js";
+import { getSubscriber, now, saveSubscriber } from "../domain-store.js";
 
-// SCAFFOLD — generated from the bot blueprint BEFORE the agent runs.
-// Keep a LIVE registration (.command / .callbackQuery / …) so this feature is
-// never an empty stub. Replace the reply body with real logic + copy; if you
-// change the user-facing text, update tests/specs to match EXACTLY.
-// Do NOT rewrite src/bot.ts — buildBot() already auto-loads this module.
-// Menu: wire this into /start via registerMainMenuItem({ label: "Subscribe", data: "subscribe:opt_in" }) if the toolkit exposes it.
-
-const composer = new Composer();
-
+registerMainMenuItem({ label: "Subscribe", data: "subscribe:opt_in", order: 10 });
+const composer = new Composer<Ctx>();
 composer.callbackQuery("subscribe:opt_in", async (ctx) => {
   await ctx.answerCallbackQuery();
-  await ctx.reply("Opt the user into broadcasts; store subscriber record");
+  const id = ctx.chat?.id;
+  if (id === undefined) return;
+  const at = now().toISOString();
+  await saveSubscriber(ctx, { chat_id: id, opt_in_timestamp: at, opt_out_timestamp: null, language_tag: ctx.from?.language_code, status: "subscribed", metadata: { source: "button" } });
+  await ctx.reply("You’re subscribed — you’ll receive community updates here.", { reply_markup: inlineKeyboard([[inlineButton("Unsubscribe", "subscribe:opt_out")]]) });
+  const owner = adminChatId(ctx);
+  if (owner && String(id) !== owner) await ctx.api.sendMessage(owner, `A new subscriber joined (chat ${id}).`);
 });
-
 export default composer;

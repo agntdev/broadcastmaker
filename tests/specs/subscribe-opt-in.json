@@ -7,7 +7,7 @@
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Opt the user into broadcasts; store subscriber record"
+              "text": "You’re subscribed — you’ll receive community updates here."
             }
           }
         ],
