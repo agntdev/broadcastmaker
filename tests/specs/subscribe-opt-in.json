@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Subscribe",
+    "steps": [
+      {
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Opt the user into broadcasts; store subscriber record"
+            }
+          }
+        ],
+        "send": {
+          "callback": "subscribe:opt_in"
+        }
+      }
+    ]
+  }
+]
