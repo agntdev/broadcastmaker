@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Unsubscribe",
+    "steps": [
+      {
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Remove user from subscriber list"
+            }
+          }
+        ],
+        "send": {
+          "callback": "subscribe:opt_out"
+        }
+      }
+    ]
+  }
+]
