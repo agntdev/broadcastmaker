@@ -144,6 +144,22 @@ export class ChatDO {
       }
     }
 
+    // Shared domain records use this DO with explicit keys. Feature code keeps
+    // its own indexes, so this endpoint never scans the Durable Object store.
+    if (url.pathname === "/domain") {
+      const key = url.searchParams.get("key");
+      if (request.method === "GET" && key) {
+        const value = await this.state.storage.get<unknown>(`domain:${key}`);
+        return value === undefined ? new Response(null, { status: 404 }) : Response.json(value);
+      }
+      if (request.method === "PUT") {
+        const body = (await request.json()) as { key?: string; value?: unknown };
+        if (!body.key) return new Response("bad request", { status: 400 });
+        await this.state.storage.put(`domain:${body.key}`, body.value);
+        return new Response(null, { status: 204 });
+      }
+    }
+
     // Schedule a reminder + (re)arm the alarm to the earliest due one.
     if (url.pathname === "/remind" && request.method === "POST") {
       const rem = (await request.json()) as Reminder;

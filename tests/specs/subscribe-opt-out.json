@@ -7,7 +7,7 @@
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Remove user from subscriber list"
+              "text": "You’re unsubscribed. You can come back anytime."
             }
           }
         ],

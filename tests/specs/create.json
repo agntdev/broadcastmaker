@@ -7,7 +7,7 @@
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Start guided wizard to compose a one-off broadcast (message type, content, optional up to 3 quick buttons)"
+              "text": "Owner access isn't set up yet."
             }
           }
         ],

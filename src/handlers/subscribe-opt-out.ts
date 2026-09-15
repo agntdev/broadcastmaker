@@ -1,17 +1,17 @@
 import { Composer } from "grammy";
+import type { Ctx } from "../bot.js";
+import { inlineButton, inlineKeyboard, registerMainMenuItem } from "../toolkit/index.js";
+import { getSubscriber, now, saveSubscriber } from "../domain-store.js";
 
-// SCAFFOLD — generated from the bot blueprint BEFORE the agent runs.
-// Keep a LIVE registration (.command / .callbackQuery / …) so this feature is
-// never an empty stub. Replace the reply body with real logic + copy; if you
-// change the user-facing text, update tests/specs to match EXACTLY.
-// Do NOT rewrite src/bot.ts — buildBot() already auto-loads this module.
-// Menu: wire this into /start via registerMainMenuItem({ label: "Unsubscribe", data: "subscribe:opt_out" }) if the toolkit exposes it.
-
-const composer = new Composer();
-
+registerMainMenuItem({ label: "Unsubscribe", data: "subscribe:opt_out", order: 11 });
+const composer = new Composer<Ctx>();
 composer.callbackQuery("subscribe:opt_out", async (ctx) => {
   await ctx.answerCallbackQuery();
-  await ctx.reply("Remove user from subscriber list");
+  const id = ctx.chat?.id;
+  if (id !== undefined) {
+    const previous = await getSubscriber(ctx, id);
+    await saveSubscriber(ctx, { chat_id: id, opt_in_timestamp: previous?.opt_in_timestamp ?? now().toISOString(), opt_out_timestamp: now().toISOString(), language_tag: previous?.language_tag ?? ctx.from?.language_code, status: "unsubscribed", metadata: previous?.metadata });
+  }
+  await ctx.reply("You’re unsubscribed. You can come back anytime.", { reply_markup: inlineKeyboard([[inlineButton("Subscribe", "subscribe:opt_in")]]) });
 });
-
 export default composer;
